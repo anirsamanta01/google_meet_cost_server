@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema(
       required: [true, 'Name is required'],
       trim: true,
       minlength: [2, 'Name must contain at least 2 characters'],
-      maxlength: [100, 'Name cannot exceed 100 characters']
+      max_length: [100, 'Name cannot exceed 100 characters']
     },
     email: {
       type: String,
@@ -21,13 +21,18 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Phone number is required'],
       trim: true,
-      maxlength: [20, 'Phone number cannot exceed 20 characters'],
+      max_length: [20, 'Phone number cannot exceed 20 characters'],
       match: [/^\+?[\d\s().-]{7,20}$/, 'Please provide a valid phone number']
     },
     password: {
       type: String,
       required: [true, 'Password is required'],
       select: false
+    },
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user',
     }
   },
   {

@@ -14,8 +14,16 @@ const requireAuth = (req, res, next) => {
     req.user = jwt.verify(token, process.env.JWT_SECRET || 'development-secret');
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Invalid or expired authentication token' });
+    return res.status(401).json({ message: 'Invalid or expired authentication token' });
   }
-}
+};
 
-export { requireAuth };
+const requireAdmin = (req, res, next) => {
+  if (!req.user || req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Admin access required' });
+  }
+
+  next();
+};
+
+export { requireAuth, requireAdmin };

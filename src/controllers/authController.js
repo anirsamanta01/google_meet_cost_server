@@ -5,19 +5,25 @@ import httpError from '../utils/httpError.js';
 
 // This function prepares the user object that you are safe to send to the frontend.
 const publicUser = (user) => {
+// Convert Mongoose user to normal object
   const serializedUser = user.toJSON ? user.toJSON() : user;
   return {
     id: serializedUser.id || serializedUser._id.toString(),
     name: serializedUser.name,
     email: serializedUser.email,
     phone: serializedUser.phone,
+    role: serializedUser.role || 'user',
     createdAt: serializedUser.createdAt
   };
 };
 
 const createToken = (user) => {
   return jwt.sign(
-    { sub: user._id.toString(), email: user.email },
+    {
+      sub: user._id.toString(),
+      email: user.email,
+      role: user.role || 'user'
+    },
     process.env.JWT_SECRET || 'development-secret',
     { expiresIn: '7d' }
   );
@@ -50,7 +56,7 @@ const signup = async (req, res, next) => {
       name: name.trim(),
       email: normalizedEmail,
       phone: normalizedPhone,
-      password: hashedPassword
+      password: hashedPassword,
     });
     res.status(201).json({ user: publicUser(user), token: createToken(user) });
   } catch (error) {
