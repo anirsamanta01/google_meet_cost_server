@@ -1,9 +1,9 @@
-import express from 'express';
-import cors from 'cors';
+import express from "express";
+import cors from "cors";
 
-import authRoutes from './routes/authRoutes.js';
-import { notFound, errorHandler } from './middleware/errorHandler.js';
-import morgan from 'morgan';
+import authRoutes from "./routes/authRoutes.js";
+import { notFound, errorHandler } from "./middleware/errorHandler.js";
+import morgan from "morgan";
 
 const app = express();
 
@@ -11,8 +11,19 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    message: "API is running",
+  });
+});
 
-app.use('/api/auth', authRoutes);
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+  });
+});
+
+app.use("/api/auth", authRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
