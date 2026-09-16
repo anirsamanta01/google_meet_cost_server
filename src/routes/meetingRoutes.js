@@ -1,0 +1,12 @@
+import express from 'express';
+import { requireAuth } from '../middleware/auth.js';
+import { createMeeting, getMeetingById, listMeetings } from '../controllers/meetingController.js';
+
+const router = express.Router();
+
+router.use(requireAuth);
+router.post('/create-meeting', createMeeting);
+router.get('/list-meetings', listMeetings);
+router.get('/view-meeting/:id', getMeetingById);
+
+export default router;
