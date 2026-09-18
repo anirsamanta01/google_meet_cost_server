@@ -48,7 +48,7 @@ const meetingSchema = new mongoose.Schema(
     versionKey: false,
   },
 );
-
+//Convert MongoDB data to JSON
 meetingSchema.set('toJSON', {
   transform: (_document, returnedMeeting) => {
     returnedMeeting.id = returnedMeeting._id.toString();

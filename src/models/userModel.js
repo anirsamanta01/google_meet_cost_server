@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema(
     versionKey: false
   }
 );
-
+//Convert MongoDB data to JSON
 userSchema.set('toJSON', {
   transform: (_document, returnedUser) => {
     returnedUser.id = returnedUser._id.toString();
