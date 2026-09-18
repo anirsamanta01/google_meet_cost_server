@@ -83,4 +83,21 @@ const getMeetingById = async (req, res, next) => {
   }
 };
 
-export { listMeetings, createMeeting, getMeetingById };
+const deleteMeeting = async (req, res, next) => {
+  try {
+    const meeting = await Meeting.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.user.sub,
+    });
+
+    if (!meeting) {
+      throw httpError(404, "Meeting not found");
+    }
+
+    res.json({message: "Meeting deleted successfully"});
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { listMeetings, createMeeting, getMeetingById, deleteMeeting };
