@@ -3,10 +3,22 @@ import httpError from "../utils/httpError.js";
 
 const serializeMeeting = (meeting) => {
   const serialized = meeting.toJSON ? meeting.toJSON() : meeting;
+  const creator =
+    serialized.userId && typeof serialized.userId === "object"
+      ? serialized.userId
+      : null;
+  const creatorId = creator?.id || creator?._id?.toString?.();
 
   return {
     id: serialized.id || serialized._id?.toString(),
-    userId: serialized.userId?.toString?.() || serialized.userId,
+    userId: creatorId || serialized.userId,
+    creator: creator
+      ? {
+          id: creatorId,
+          name: creator.name,
+          email: creator.email,
+        }
+      : null,
     title: serialized.title,
     date: serialized.date,
     time: serialized.time,
@@ -45,9 +57,9 @@ const createMeeting = async (req, res, next) => {
 
 const listMeetings = async (req, res, next) => {
   try {
-    const meetings = await Meeting.find({ userId: req.user.sub }).sort({
-      createdAt: -1,
-    });
+    const meetings = await Meeting.find({ userId: req.user.sub })
+      .populate("userId", "name email")
+      .sort({createdAt: -1});
     res.json({ meetings: meetings.map(serializeMeeting) });
   } catch (error) {
     next(error);
@@ -59,7 +71,7 @@ const getMeetingById = async (req, res, next) => {
     const meeting = await Meeting.findOne({
       _id: req.params.id,
       userId: req.user.sub,
-    });
+    }).populate("userId", "name email");
 
     if (!meeting) {
       throw httpError(404, "Meeting not found");
