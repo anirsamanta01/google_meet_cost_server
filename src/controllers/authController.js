@@ -82,7 +82,7 @@ const signin = async (req, res, next) => {
       throw httpError(401, "Invalid email or password");
     }
 
-    res.json({ user: publicUser(user), token: createToken(user) });
+    res.json({ user: publicUser(user), token: createToken(user), role: publicUser(user).role });
   } catch (error) {
     next(error);
   }
