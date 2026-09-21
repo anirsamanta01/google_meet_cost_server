@@ -22,6 +22,7 @@ const createToken = (user) => {
     {
       sub: user._id.toString(),
       email: user.email,
+      role: user.role,
     },
     process.env.JWT_SECRET || "development-secret",
     { expiresIn: "7d" },
