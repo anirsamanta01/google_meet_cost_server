@@ -59,6 +59,9 @@ const updateUserRole = async (req, res, next) => {
     if (!['user', 'admin'].includes(role)) {
       throw httpError(400, "Role must be user or admin");
     }
+    if (req.params.id === req.user.sub) {
+      throw httpError(400, "You cannot change your own role");
+    }
 
     const user = await User.findByIdAndUpdate(
       req.params.id,
@@ -75,4 +78,33 @@ const updateUserRole = async (req, res, next) => {
   }
 };
 
-export {getAdminOverview, listUsers, updateUserRole};
+const listAdminMeetings = async (_req, res, next) => {
+  try {
+    const meetings = await Meeting.find()
+      .populate("userId", "name email")
+      .sort({createdAt: -1});
+    res.json({meetings});
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteAdminMeeting = async (req, res, next) => {
+  try {
+    const meeting = await Meeting.findByIdAndDelete(req.params.id);
+    if (!meeting) {
+      throw httpError(404, "Meeting not found");
+    }
+    res.json({message: "Meeting deleted successfully"});
+  } catch (error) {
+    next(error);
+  }
+};
+
+export {
+  deleteAdminMeeting,
+  getAdminOverview,
+  listAdminMeetings,
+  listUsers,
+  updateUserRole,
+};
