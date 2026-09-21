@@ -12,6 +12,7 @@ const publicUser = (user) => {
     name: serializedUser.name,
     email: serializedUser.email,
     phone: serializedUser.phone,
+    role: serializedUser.role,
     createdAt: serializedUser.createdAt,
   };
 };
