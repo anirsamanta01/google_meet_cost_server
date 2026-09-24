@@ -23,7 +23,6 @@ const serializeMeeting = (meeting) => {
     date: serialized.date,
     time: serialized.time,
     duration: serialized.duration,
-    meetingLink: serialized.meetingLink || '',
     attendees: serialized.attendees || [],
     cost: serialized.cost || "$0",
     peopleCount: Number(serialized.peopleCount || 0),
@@ -33,20 +32,10 @@ const serializeMeeting = (meeting) => {
 
 const createMeeting = async (req, res, next) => {
   try {
-    const { title, date, time, duration, meetingLink, attendees, cost } = req.body;
+    const { title, date, time, duration, attendees, cost } = req.body;
 
     if (!title || typeof title !== "string" || title.trim().length < 2) {
       throw httpError(400, "Meeting title is required");
-    }
-
-    const normalizedMeetingLink = String(meetingLink || '').trim();
-    if (
-      normalizedMeetingLink &&
-      !/^https:\/\/meet\.google\.com\/[a-z]{3,}-[a-z]{4,}-[a-z]{3,}(?:[/?#].*)?$/i.test(
-        normalizedMeetingLink,
-      )
-    ) {
-      throw httpError(400, "Enter a valid Google Meet link");
     }
 
     const meeting = await Meeting.create({
@@ -55,7 +44,6 @@ const createMeeting = async (req, res, next) => {
       date: date || "Aug 25, 2026",
       time: time || "09:30 AM",
       duration: duration || "45 minutes",
-      meetingLink: normalizedMeetingLink,
       attendees: Array.isArray(attendees) ? attendees : [],
       cost: cost || "$0",
       peopleCount: Array.isArray(attendees) ? attendees.length : 0,
