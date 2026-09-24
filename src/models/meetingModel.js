@@ -29,6 +29,11 @@ const meetingSchema = new mongoose.Schema(
       default: '45 minutes',
       trim: true,
     },
+    meetingLink: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     attendees: {
       type: [String],
       default: [],
