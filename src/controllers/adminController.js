@@ -1,6 +1,7 @@
 import Meeting from "../models/meetingModel.js";
 import User from "../models/userModel.js";
 import httpError from "../utils/httpError.js";
+import bcrypt from "bcryptjs";
 
 const publicAdminUser = user => ({
   id: user.id || user._id.toString(),
@@ -48,6 +49,41 @@ const listUsers = async (_req, res, next) => {
   try {
     const users = await User.find().sort({createdAt: -1});
     res.json({users: users.map(publicAdminUser)});
+  } catch (error) {
+    next(error);
+  }
+};
+
+const createUser = async (req, res, next) => {
+  try {
+    const {name, email, phone, password} = req.body;
+    const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+    const normalizedPhone = typeof phone === 'string' ? phone.trim() : '';
+
+    if (!name || typeof name !== 'string' || name.trim().length < 2) {
+      throw httpError(400, 'Name must contain at least 2 characters');
+    }
+    if (!/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
+      throw httpError(400, 'A valid email is required');
+    }
+    if (!/^\+?[\d\s().-]{7,20}$/.test(normalizedPhone)) {
+      throw httpError(400, 'A valid phone number is required');
+    }
+    if (typeof password !== 'string' || password.length < 8) {
+      throw httpError(400, 'Password must contain at least 8 characters');
+    }
+    if (await User.exists({email: normalizedEmail})) {
+      throw httpError(409, 'An account with this email already exists');
+    }
+
+    const user = await User.create({
+      name: name.trim(),
+      email: normalizedEmail,
+      phone: normalizedPhone,
+      password: await bcrypt.hash(password, 12),
+      role: 'user',
+    });
+    res.status(201).json({user: publicAdminUser(user)});
   } catch (error) {
     next(error);
   }
@@ -102,6 +138,7 @@ const deleteAdminMeeting = async (req, res, next) => {
 };
 
 export {
+  createUser,
   deleteAdminMeeting,
   getAdminOverview,
   listAdminMeetings,
