@@ -82,6 +82,7 @@ const createUser = async (req, res, next) => {
       phone: normalizedPhone,
       password: await bcrypt.hash(password, 12),
       role: 'user',
+      addedByAdmin: true,
     });
     res.status(201).json({user: publicAdminUser(user)});
   } catch (error) {

@@ -69,8 +69,8 @@ const listMeetings = async (req, res, next) => {
 
 const listAttendees = async (_req, res, next) => {
   try {
-    const users = await User.find()
-      .select("name email")
+    const users = await User.find({ addedByAdmin: true })
+      .select("name email role")
       .sort({ name: 1 });
 
     res.json({
@@ -78,6 +78,7 @@ const listAttendees = async (_req, res, next) => {
         id: user.id || user._id.toString(),
         name: user.name,
         email: user.email,
+        role: user.role,
       })),
     });
   } catch (error) {
