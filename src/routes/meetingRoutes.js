@@ -3,6 +3,7 @@ import { requireAuth } from '../middleware/auth.js';
 import {
 	createMeeting,
 	deleteMeeting,
+	listAttendees,
 	getMeetingById,
 	listMeetings,
 } from '../controllers/meetingController.js';
@@ -10,6 +11,7 @@ import {
 const router = express.Router();
 
 router.use(requireAuth);
+router.get('/attendees', listAttendees);
 router.post('/create-meeting', createMeeting);
 router.get('/list-meetings', listMeetings);
 router.get('/view-meeting/:id', getMeetingById);

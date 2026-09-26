@@ -1,4 +1,5 @@
 import Meeting from "../models/meetingModel.js";
+import User from "../models/userModel.js";
 import httpError from "../utils/httpError.js";
 
 const serializeMeeting = (meeting) => {
@@ -66,6 +67,24 @@ const listMeetings = async (req, res, next) => {
   }
 };
 
+const listAttendees = async (_req, res, next) => {
+  try {
+    const users = await User.find()
+      .select("name email")
+      .sort({ name: 1 });
+
+    res.json({
+      users: users.map(user => ({
+        id: user.id || user._id.toString(),
+        name: user.name,
+        email: user.email,
+      })),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getMeetingById = async (req, res, next) => {
   try {
     const meeting = await Meeting.findOne({
@@ -100,4 +119,4 @@ const deleteMeeting = async (req, res, next) => {
   }
 };
 
-export { listMeetings, createMeeting, getMeetingById, deleteMeeting };
+export { listAttendees, listMeetings, createMeeting, getMeetingById, deleteMeeting };
